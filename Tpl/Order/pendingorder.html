@@ -1,0 +1,72 @@
+<script type="text/javascript" src="__PUBLIC__/kindeditor-min.js"></script>
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/themes/default/default.css">
+<script type="text/javascript">
+function resend() {
+	document.location.href = '{:U('pendingorder', array('sendmail'=>1))}';
+}
+function regret() {
+	var dialog = KindEditor.dialog({
+		title: '操作确认',
+		body: '<div style="padding: 10px">真的要放弃这个预约吗？</div>',
+		yesBtn: {
+			name: '确定',
+			click: function() {
+				document.location.href = '{:U('regret')}';
+			}
+		},
+		noBtn: {
+			name: '取消',
+			click: function() {
+				dialog.remove();
+			}
+		},
+		closeBtn: {
+			name: '取消',
+			click: function() {
+				dialog.remove();
+			}
+		}
+	});
+}
+</script>
+<div class="float-fix">
+	<div style="width: 63%; float: left; color: #222">
+		<div style="padding-left: 20px;">
+			<h1>{$title}</h1>
+		</div>
+		<div class="ribbon"><div class="padding">
+			预约内容
+		</div></div>
+		<div style="padding-left: 50px; line-height: 40px;">
+			<label>预约人：</label>
+			<b>{$order.info.orderer} ({$order.orderer})</b>
+			<br/>
+			<label>预约房间：</label>
+			<b>{$order.info.roomname}</b>
+			&nbsp;&nbsp;
+			<a href="{:U('Index/room', array('id'=>$order['room']))}" target="_blank">房间详情</a>
+			<br/>
+			<label>预约时间：</label>
+			<b>
+				{$order.date|num2date} &nbsp;
+				{$order.starthour}点 - {:$order['endhour'] + 1}点
+			</b>
+			<br/>
+			<label>活动主题：</label>
+			<b>{$order.info.topic}</b>
+		</div>
+	</div>
+	<div style="float: right; width: 35%" class="nav-bar">
+		<div class="nav-bar2">
+			<div class="nav-bar3">
+				<i style="display:block;padding: 15px">请查阅您的<a href="http://mail.bjtu.edu.cn" target="_blank">邮箱</a>，点击里面的验证链接以完成预约。</i>
+				<a class="active">您还可以...</a>
+				<div style="text-align: center; padding: 10px; padding-right: 50px; color: #222">
+					<button class="btn" onclick="resend()">重新发送邮件</button>
+					<br/> <input type="hidden" value="{$order.key}"/>
+					<button class="btn" style="color: #FCC" onclick="regret()">放弃这个预约</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

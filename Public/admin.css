@@ -1,0 +1,101 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: arial;
+}
+
+a {
+	text-decoration: none;
+}
+
+.tiny {
+	width: 1px;
+	height: 1px;
+	border: 0;
+	background: transparent;
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.fix-width {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+.navigate {
+	height: 30px;
+	position: absolute;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: #555;
+	background: rgba(0, 0, 0, 0.7);
+	border-bottom: 2px solid #222;
+}
+
+.navigate ul {
+	margin: 0;
+	padding: 0;
+	float: right;
+}
+
+.navigate ul li {
+	float: left;
+	display: block;
+	text-align: center;
+	line-height: 30px;
+}
+
+.navigate ul li:hover {
+	background: #777;
+}
+
+.navigate ul li a {
+	color: #FFF;
+	display: block;
+	height: 30px;
+	width: 90px;
+	font-size: 13px;
+}
+
+.navigate ul ul {
+	display: none;
+}
+
+.navigate ul ul li {
+	float: none;
+	background: #555;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.navigate label {
+	float: left;
+	color: #EEE;
+	line-height: 30px;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.pager {
+	text-align: center;
+}
+.pager a {
+	font-size: 13px;
+	padding: 5px;
+	margin: 2px;
+	border: 1px solid #AAA;
+	color: #559;
+}
+.pager a:hover {
+	background: #EEE;
+}
+.pager a.current {
+	color: #000;
+	font-weight: bold;
+}

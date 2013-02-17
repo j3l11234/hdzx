@@ -1,0 +1,120 @@
+<style type="text/css">
+#imageList .item {
+	overflow: hidden;
+	height: 30px;
+	margin-bottom: 5px;
+	border-bottom: 1px dashed #AAA;
+}
+#imageList .item p {
+	display: block;
+	height: 30px;
+	line-height: 30px;
+	padding: 0;
+	margin: 0;
+}
+#imageList .item img {
+	display: block;
+	margin: 5px auto;
+}
+</style>
+<script type="text/javascript">
+function onUpload(frame) {
+	$('#imagePicker').val('');
+	var result = $(frame).contents().text();
+	try {
+		eval('result = ' + result);
+	} catch(e){}
+	if(!result)
+		return;
+	if(result.success) {
+		var inst = '<div class="item"><p>正在加载。。</p><img onload="imageOnload(this)" src="__PUBLIC__/images/slides/' + result.path + '" alt="' + result.path + '"/></div>'; $('#imageList').append(inst);
+	}
+}
+function imageOnload(item) {
+	if($(item).hasClass('loaded')) {
+		return;
+	}
+	$(item).addClass('loaded');
+	var w = $(item).width(), h = $(item).height();
+	var pw = w, ph = h;
+	if(w > 700) {
+		w = 700;
+		h = Math.floor(w * ph / pw);
+	}
+	$(item).css({width: w, height: h});
+	$(item).parent().css({height: (h + 40) + 'px'});
+	var p = '图片尺寸：' + pw + ' x ' + ph;
+	p += ' &nbsp; <button onclick="up(this)">提前</button> <button onclick="down(this)">下降</button> <button onclick="del(this)">删除</button>';
+	$(item).prev('p').html(p);
+}
+function del(item) {
+	$(item).parent().parent().hide(300, function() {
+		$(this).remove();
+	});
+}
+function up(item) {
+	var item = $(item).parent().parent();
+	var prev = item.prev('.item');
+	if(prev[0]) {
+		item.hide(200, function() {
+			var tmp = prev.html();
+			prev.html(item.html());
+			item.html(tmp);
+			tmp = prev.css('height');
+			prev.css('height', item.css('height'));
+			item.css('height', tmp);
+			item.show();
+			prev.hide();
+			prev.show(200);
+			var p = prev.position().top - 50;
+			$('body').animate({scrollTop: p}, 200);
+		});
+	}
+}
+function down(item) {
+	var item = $(item).parent().parent();
+	var next = item.next('.item');
+	if(next[0]) {
+		item.hide(200, function() {
+			var tmp = next.html();
+			next.html(item.html());
+			item.html(tmp);
+			tmp = next.css('height');
+			next.css('height', item.css('height'));
+			item.css('height', tmp);
+			item.show();
+			next.hide();
+			next.show(200);
+			var p = next.position().top - 50;
+			$('body').animate({scrollTop: p}, 200);
+		});
+	}
+}
+function save() {
+	var content = '';
+	$('#imageList .item img').each(function() {
+		content += '<input type="hidden" name="item[]" value="' + $(this).attr('alt') + '"/>';
+	});
+	$('#saveForm').html(content);
+	$('#saveForm')[0].submit();
+}
+</script>
+<div id="imageList">
+	<?php foreach($slide as $item) {
+		$item = trim($item); ?>
+	<div class="item">
+		<p>正在加载。。</p>
+		<img onload="imageOnload(this)" src="__PUBLIC__/images/slides/{$item}" alt="{$item}"/>
+	</div>
+	<?php } ?>
+</div>
+<form method="post" enctype="multipart/form-data" action="{:U('slideUpload')}" target="uploadFrame">
+	<input type="file" name="image" id="imagePicker"/>
+	<input type="submit" value="添加图片"/>
+	&nbsp;
+	推荐尺寸(像素)：940(宽) x 250(高)
+</form>
+<button onclick="save()">保存幻灯片设置</button>
+<button onclick="document.location.reload()">重置修改</button>
+<form id="saveForm" method="post" action="{:U('saveSlideShow')}"></form>
+<iframe class="tiny" name="uploadFrame" id="uploadFrame" src="about:blank" onload="onUpload(this)"></iframe>

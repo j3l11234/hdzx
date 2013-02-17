@@ -1,0 +1,170 @@
+.slide-show {
+	position: relative;
+}
+
+.slide-show .head {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: url(images/pageBg-slideTop.png) no-repeat;
+	height: 4px;
+}
+
+.slide-show .foot {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: url(images/pageBg-slideBottom.png) no-repeat;
+	height: 55px;
+}
+
+.slide-show .next, .slide-show .prev {
+	width: 51px;
+	height: 64px;
+	position: absolute;
+	top: 30%;
+}
+
+.slide-show .next:hover, .slide-show .prev:hover {
+	background-position: 0 64px;
+}
+
+.slide-show .prev {
+	background: url(images/slide-previous.png);
+	left: 12px;
+}
+
+.slide-show .next {
+	background: url(images/slide-next.png);
+	right: 12px;
+}
+
+.slide-show ul {
+	display: none;
+}
+
+.slide-show .content {
+	padding: 0;
+	width: 935px;
+	margin: 0 auto;
+}
+
+.slide-show .content-slide {
+	width: 100%;
+	height: 250px;
+}
+
+.slide-show .pager {
+	position: absolute;
+	top: 10px;
+	right: 50px;
+}
+
+.slide-show .pager a {
+	width: 16px;
+	height: 15px;
+	display: block;
+	float: left;
+	background: url(images/slide-pager.png);
+}
+
+.tip-left {
+	background: url(images/droid.png) no-repeat left center;
+	float: left;
+	margin-left: 30px;
+	padding-left: 150px;
+	height: 80px;
+}
+
+.tip-right {
+	float: right;
+	padding-right: 120px;
+	margin-right: 30px;
+	background: url(images/operate.png) no-repeat right center;
+}
+
+.tip-right h3, .tip-left h3 {
+	margin: 0px;
+	padding-top: 15px;
+	color: #333;
+}
+
+.tip-right p, .tip-left p {
+	font-size: 12px;
+	padding: 5px 0;
+	margin: 0;
+	line-height: 16px;
+}
+
+h1 {
+	color: #000;
+}
+
+.quote-1 {
+	background: url(images/quote-small-top.gif) no-repeat left top;
+	padding-top: 17px;
+}
+
+.quote-2 {
+	background: url(images/quote-small-bottom.gif) no-repeat left bottom;
+	padding-bottom: 38px;
+}
+
+.quote-3 {
+	background: url(images/quote-small-repeat.gif) repeat-y left;
+	padding-left: 15px;
+	padding-right: 35px;
+	color: #000;
+	line-height: 20px;
+	font-size: 13px;
+}
+
+.news-item {
+	margin: 10px 0;
+}
+
+.news-item .thumb {
+	float: left;
+	padding: 5px;
+	border: 1px solid #CCC;
+	background: #FFF;
+	border-radius: 5px;
+}
+
+.news-item .thumb:hover {
+	background: #CEC;
+}
+
+.news-item .thumb img {
+	border: 1px solid #CEC;
+	display: block;
+	width: 150px;
+	height: 80px;
+}
+
+.news-item .thumb:hover img {
+	border-color: #FFF;
+}
+
+.news-item .summary {
+	float: left;
+	width: 370px;
+	margin-left: 20px;
+}
+
+.news-item h2 {
+	color: #111;
+	margin: 5px 0 2px 0;
+	font-size: 20px;
+}
+
+.news-item p {
+	margin: 0;
+	margin-bottom: 10px;
+}
+
+.news-item {
+	font-size: 13px;
+}

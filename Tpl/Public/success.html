@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+	<head>
+		<title>系统反馈信息</title>
+		<script type="text/javascript">
+		var counter = {$delay};
+		function countDown() {
+			document.getElementById('countdown').innerHTML = counter;
+			if(counter > 0)
+				setTimeout(countDown, 1000);
+			else
+				document.location.href = '{$url}';
+			counter--;
+		}
+		</script>
+	</head>
+	<body onload="countDown()">
+		<div style="text-align: center; padding-top: 100px">
+			<h1 style="font-size: 40px; color: #222;">{$message}</h1>
+			<div style="font-size: 13px">
+				将在<span id="countdown">{$delay}</span>秒后跳转，或者<a href="{$url}">点击这里直接跳转</a>
+			</div>
+		</div>
+	</body>
+</html>

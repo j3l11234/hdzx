@@ -1,0 +1,51 @@
+<link rel="stylesheet" href="__PUBLIC__/themes/default/default.css" />
+<script type="text/javascript" src="__PUBLIC__/kindeditor-min.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('.newsList table tr:odd td').css('background', '#EEE');
+});
+function remove(id, title) {
+	var dialog = KindEditor.dialog({
+		title: '操作确认',
+		body: '<p style="padding:10px;">真的要删除“' + title + '”吗？</p>',
+		yesBtn:{
+			name: "删除",
+			click: function() {
+				document.location.href='{:U('deleteNews',array('id'=>''))}' + id;
+			}
+		},
+		closeBtn:{
+			name: '关闭',
+			click: function() {
+				dialog.remove();
+			}
+		},
+		noBtn:{
+			name: '取消',
+			click: function() {
+				dialog.remove();
+			}
+		}
+	});
+}
+</script>
+<div class="pager" style="padding: 10px 0;">{:show_pager($totalPage, $currentPage, U('news', array('page'=>'$$')))}</div>
+<div class="newsList">
+	<table cellpadding="10" cellspacing="0">
+	<?php foreach($news as $item) { ?>
+		<tr>
+			<td valign="top"><img src="__PUBLIC__/{$item.thumb}" style="width: 152px; height: 82px; border: 1px solid #DDD"/></td>
+			<td valign="top">
+				<b>{$item.title}</b>
+				<p style="margin: 7px; width: 750px;">{$item.summary}...</p>
+				<a href="{:U('editNews', array('id'=>$item['newsid']))}"><button>编辑</button></a>
+				<a href="{:U('Index/article', array('id'=>$item['newsid']))}"><button>浏览</button></a>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="remove({$item.newsid}, '{:htmlspecialchars($item['title'])}')">删除</button>
+			</td>
+		</tr>
+	<?php } ?>
+	</table>
+</div>
+<div class="pager" style="padding: 10px 0;">{:show_pager($totalPage, $currentPage, U('news', array('page'=>'$$')))}</div>
+<a href="{:U('editNews')}"><button>发布新闻</button></a>

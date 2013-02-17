@@ -1,0 +1,203 @@
+<script type="text/javascript" src="__PUBLIC__/jqueryui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/kindeditor-min.js"></script>
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/jqueryui.css">
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/themes/default/default.css">
+<style type="text/css">
+.field {
+	outline: none;
+	padding: 5px;
+	background: #EEE;
+	border: 0; border-bottom: 1px solid #AAA;
+	width: 150px;
+}
+td {
+	height: 30px;
+}
+label, i {
+	font-size: 13px;
+	line-height: 30px;
+	margin: 0 10px;
+}
+i {
+	color: #555;
+}
+#tips {
+	position: absolute;
+	width: 150px;
+	padding: 4px;
+	background: #F2F2F2;
+	border: 1px solid #CCC;
+	display: none;
+	top: -2px;
+	left: 0;
+}
+#tips a {
+	display: block;
+	padding: 2px 5px;
+	color: #557;
+	font-size: 13px;
+}
+#tips a:hover {
+	background: #FFF;
+}
+</style>
+<script type="text/javascript">
+var hidedelay = false;
+function showtip() {
+	$.get('{:U('Query/roomtypes')}', function(result) {
+		$('#tips').html('');
+		if(result) {
+			for(k in result) {
+				$('#tips').append('<a href="javascript:void(0)" onclick="settype(this)">' + result[k] + '</a>');
+			}
+			$('#tips').slideDown(200);
+		}
+	}, 'JSON');
+}
+function hidetip() {
+	hidedelay = setTimeout(function() {
+		$('#tips').slideUp(200);
+	}, 200);
+}
+function settype(item) {
+	var t = $('#type').val();
+	if(t == '')
+		t = $(item).html();
+	else
+		t += ',' + $(item).html();
+	$('#type').val(t);
+	$('#type').focus();
+	clearTimeout(hidedelay);
+}
+function locktype(item) {
+	$('.param').hide();
+	$('.type' + $(item).val()).show();
+}
+$(function() {
+	$('.datepicker').each(function() {
+		$(this).val($(this).val().substr(0, 10));
+	});
+	$('.datepicker').datepicker({
+		minDate: 0
+	});
+	$('.datepicker').attr('readonly', true);
+	locktype($('#lockcode'));
+});
+function remove() {
+	var dialog = KindEditor.dialog({
+		title: '操作确认',
+		body: '<div style="padding: 10px">真的要删除这个锁吗？</div>',
+		yesBtn: {
+			name: '删除',
+			click: function() {
+				document.location.href = '{:U('deleteLock', array('id'=>$lockid))}';
+			}
+		},
+		noBtn: {
+			name: '取消',
+			click: function() {
+				dialog.remove();
+			}
+		},
+		closeBtn: {
+			name: '取消',
+			click: function() {
+				dialog.remove();
+			}
+		}
+	});
+}
+</script>
+<form action="{:U('saveLock')}" method="post">
+	<table style="display: block; width: 600px; margin: 0 auto;">
+		<tr>
+			<td><label>锁标题：</label></td>
+			<td><input type="text" name="title" class="field" value="{$lock.title}"/></td>
+		</tr>
+		<tr>
+			<td><label>房间号：</label></td>
+			<td>
+				<input type="text" name="number" class="field" value="{$lock.number}"/>
+				<i>多个房间号用“,”分开</i>
+			</td>
+		</tr>
+		<tr>
+			<td><label>房间类型：</label></td>
+			<td>
+				<input type="text" id="type" name="type" class="field" value="{$lock.type}" onclick="showtip()" onblur="hidetip()"/>
+				<i>多个房间类型用“,”分开。</i>
+				<div style="position:relative">
+					<div id="tips"></div>
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2"><i>房间类型与房间号都不填写则锁将应用于所有的房间</i></td></tr>
+		<tr>
+			<td><label>锁过期时间：</label></td>
+			<td>
+				<input type="text" name="expire" id="expire" class="field datepicker" value="{$lock.expire}"/>
+				&nbsp;
+				<input type="button" onclick="$('#expire').val('')" value="永不过期"/>
+			</td>
+		</tr>
+		<tr>
+			<td><label>锁类型：</label></td>
+			<td>
+				<?php
+				$lock_types = array();
+				foreach($lockCodes as $k => $f) {
+					$lock_types[$f['code']] = $k;
+				}
+				?>
+				<select name="lockcode" onchange="locktype(this)" id="lockcode">
+					{:options($lock_types, $lock['lockcode'])}
+				</select>
+			</td>
+		</tr>
+		<?php foreach($lockCodes as $code) { ?>
+			<tr class="param type{$code.code}">
+				<td colspan="2">
+					<i>{$code.hint}</i>
+				</td>
+			</tr>
+			<?php foreach($code['param'] as $k => $field) { ?>
+				<tr class="param type{$code.code}">
+					<td><label>{$field.title}：</label></td>
+					<td>
+						<?php
+							if(!isset($field['type']))
+								$field['type'] = 'text';
+							if(is_array($field['type'])) { ?>
+							<select name="{$k}">
+							{:options($field['type'], $lock[$k])}
+							</select>
+						<?php } else
+								switch($field['type']) {
+								case 'text': ?>
+							<input type="text" name="{$k}" class="field" value="{$lock[$k]}"/>
+							<?php break;case 'date': ?>
+							<input type="text" name="{$k}" class="field datepicker" value="{$lock[$k]}"/>
+						<?php } ?>
+					</td>
+				</tr>
+			<?php } ?>
+		<?php } ?>
+		<tr>
+			<td><label>时段：</label></td>
+			<td>
+				<input type="text" name="hours" class="field" value="{$lock.hours}"/>
+				<i>多个时段号用“,”分开，如：8,9,10</i>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><br/>
+			<input type="submit" value="{:$lockid==0?'添加':'保存'}"/>
+			<?php if($lockid) { ?>
+				<input type="button" value="删除" style="margin-left: 20px; color: #F00;" onclick="remove()"/>
+			<?php } ?>
+			</td>
+		</tr>
+	</table>
+	<input type="hidden" name="lockid" value="{$lockid}"/>
+</form>

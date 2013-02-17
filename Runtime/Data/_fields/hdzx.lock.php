@@ -1,0 +1,1 @@
+{"0":"lockid","1":"title","2":"lockcode","3":"param","4":"expire","_autoinc":true,"_pk":"lockid","_type":{"lockid":"int(11)","title":"varchar(255)","lockcode":"varchar(255)","param":"varchar(255)","expire":"timestamp"}}

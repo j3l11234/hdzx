@@ -1,0 +1,68 @@
+<script type="text/javascript" src="__PUBLIC__/kindeditor-min.js"></script>
+<script type="text/javascript">
+$(function() {
+	KindEditor.create('textarea');
+});
+function editthumb() {
+	var dialog = KindEditor.dialog({
+		width: 300,
+		title: '上传新的新闻图签',
+		body: '<div><form id="thumbUploadForm" action="{:U('thumbNews', array('id'=>$news['newsid']))}" enctype="multipart/form-data" method="post" target="uploadFrame" style="padding:20px;">'
+				+'<input type="file" name="upload"/>'
+				+'</form><iframe class="tiny" id="uploadFrame" name="uploadFrame"></iframe></div>',
+		closeBtn: {
+			name: '关闭',
+			click: function() {
+				dialog.remove();
+			}
+		},
+		yesBtn: {
+			name: '确定',
+			click: function() {
+				$('#uploadFrame').load(function() {
+					var result = $(this).contents().text();
+					var success = false;
+					if(result) {
+						eval('result=' + result);
+						if(result.success) {
+							success = true;
+							$('#thumb').attr('src', '__PUBLIC__/' + result.path);
+							$('#changethumb').val(result.path);
+						}
+					}
+					if(!success)
+						alert('上传失败');
+					dialog.remove();
+				});
+				$('#thumbUploadForm')[0].submit();
+				setTimeout(function() {
+					$('#thumbUploadForm').html('正在上传。。，关闭对话框会终止上传');
+				}, 10);
+			}
+		},
+		noBtn: {
+			name: '关闭',
+			click: function() {
+				dialog.remove();
+			}
+		}
+	});
+}
+</script>
+<form action="{:U('saveNews', array('id'=>$news['newsid']))}" method="post">
+	<table cellspacing="10"><tr>
+		<td valign="top" style="text-align: center; font-size: 13px;">
+			<a href="javascript:void(0);" onclick="editthumb()">
+				<img id="thumb" src="__PUBLIC__/{$news.thumb}" style="width: 152px; height: 82px; border: 1px solid #CCC"/>
+				<br/>
+				修改图签
+			</a>
+			<input type="hidden" id="changethumb" name="changethumb" value="0"/>
+			<br/><br/>
+			<input type="submit" value="发布新闻" style="padding: 5px; margin: 10px;"/>
+		</td><td>
+			<label>标题：</label> <input type="text" name="title" value="{$news.title}" style="width: 500px; outline: none; padding: 5px; background: #EEE; border: 0; border-bottom: 1px solid #AAA;"/> <br/>
+			<textarea style="width: 100%; height: 300px;" name="content">{$news.content}</textarea>
+		</td>
+	</tr></table>
+</form>
