@@ -302,3 +302,14 @@ button.btn:hover span {
 	text-align: center;
 	outline: none;
 }
+.pager {
+	text-align: center;
+	padding: 10px;
+}
+.pager a {
+	color: #557;
+	margin: 5px;
+}
+.pager .current {
+	color: #000;
+}

@@ -134,5 +134,16 @@ class RoomStatusModel extends Model {
 		}
 		return $ret;
 	}
+
+	public function isFree($room, $date, $start, $end = NULL) {
+		if(($start = 1 * $start) < 10) $start = '0' . $start;
+		if(!$end)
+			$end = $start;
+		elseif(($end = 1 * $end) < 10) $end = '0' . $end;
+		return 0 == $this->where(array(
+			'room' => $room,
+			'time' => array(array('egt', $date . $start), array('elt', $date . $end))
+		))->count();
+	}
 }
 ?>

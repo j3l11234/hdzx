@@ -1,5 +1,6 @@
 <?php
 return array(
+	'SHOW_ERROR_MSG' => true,
 	'APP_STATUS' => 'debug',
 	'DB_HOST' => 'localhost',
 	'DB_USER' => 'root',

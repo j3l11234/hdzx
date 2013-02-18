@@ -401,7 +401,7 @@ class AdminAction extends Action {
 		if($res) {
 			$res = $res[0];
 			$_POST['content'] = htmlspecialchars($_POST['content']);
-			if(sendmail($res['email'], '学生活动服务中心 - 反馈回复', $_POST['content'])) {
+			if(sendmail($res['email'], '学生活动服务中心 - 反馈回复', htmlspecialchars($_POST['content']))) {
 				$data = $where;
 				$data['reply'] = '<div class="title">回复 ' . date('Y-m-d H:i:s', NOW) . '</div><pre class="content">' . $_POST['content'] . '</pre>' . $res['reply'];
 				$dao->save($data);

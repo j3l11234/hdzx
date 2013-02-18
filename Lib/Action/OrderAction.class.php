@@ -100,14 +100,7 @@ class OrderAction extends BaseAction {
 		$this->assign('date', $date);
 		$r = D('Room')->where(array('roomid'=>$room))->field('intro', true)->select();
 		if($r) {
-			$result = D('School')->order('align')->field('align', true)->select();
-			if($result) {
-				$school = array();
-				foreach($result as $v) {
-					$school[$v['schoolid']] = $v['name'];
-				}
-				$this->assign('schools', $school);
-			}
+			$this->assign('schools', D('School')->getList());
 			$this->assign('room', $r[0]);
 			$this->display();
 		}

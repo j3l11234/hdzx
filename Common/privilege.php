@@ -6,7 +6,7 @@ function PRV($title, $value = NULL) {
 	}
 	if(!isset($_SESSION['privilege']))
 		$_SESSION['privilege'] = array();
-	if($value)
+	if($value !== NULL)
 		$_SESSION['privilege'][$key] = $value;
 	elseif(isset($_SESSION['privilege'][$key]))
 		return $_SESSION['privilege'][$key];
