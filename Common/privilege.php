@@ -1,6 +1,6 @@
 <?php
-function PRV($title, $value = NULL) {
-	if($title === false && $value === true) {
+function PRV($key, $value = NULL) {
+	if($key === false && $value === true) {
 		$_SESSION['privilege'] = array();
 		return;
 	}

@@ -1,9 +1,13 @@
 <?php
 class AdminAction extends Action {
+
+	public function _initialize() {
+		if(!PRV('admin'))
+			$this->redirect('User/login', array('prev'=>'Admin:index'));
+	}
 	
 	public function display() {
 		$dir = array(
-			'网站首页' => 'Index/index',
 			'全局设置' => array(
 				'基本参数' => 'settings',
 				'导航栏设置' => 'navibar',
@@ -19,14 +23,15 @@ class AdminAction extends Action {
 			),
 			'房间管理' => array(
 				'房间列表' => 'room',
-				'房间批量修改' => 'batchRoom',
 				'房间锁列表' => 'lock',
 			),
-			'杂项' => array(
-				'后台地图' => 'index',
+			'其他杂项' => array(
+				'系统统计' => 'index',
 				'账户设置' => 'account',
-				'用户反馈' => 'feedback'
-			)
+				'用户反馈' => 'feedback',
+				'网站首页' => 'Index/index',
+			),
+			'退出后台' => 'User/logout'
 		);
 		function getTitle(&$dir) {
 			foreach($dir as $k => $v) {
@@ -59,8 +64,16 @@ class AdminAction extends Action {
 		die();
 	}
 	
-	// site map
+	// Statistics
 	public function index() {
+		$this->assign('roomCount', D('Room')->count());
+		$this->assign('orderTotalCount', D('Order')->count());
+		$this->assign('orderPassTotalCount', D('Order')->where(array('isverified'=>1))->count());
+		$month = date('Ym00', NOW);
+		$this->assign('orderMonthCount', D('Order')->where('`date` > ' . $month)->count());
+		$this->assign('orderPassMonthCount', D('Order')->where(array('isverified'=>1,'date'=>array('gt',$month)))->count());
+		$this->assign('feedbackCount', D('Feedback')->count());
+		$this->assign('feedbackMonthCount', D('Feedback')->where('`time` > '.$month)->count());
 		$this->display();
 	}
 
@@ -324,6 +337,8 @@ class AdminAction extends Action {
 		$_POST['needsecure'] = isset($_POST['needsecure']);
 		$_POST['hasmedia'] = isset($_POST['hasmedia']);
 		$_POST['autoverify'] = isset($_POST['autoverify']);
+		if($_POST['maxhour'] < 1)
+			$_POST['maxhour'] = 99;
 		$dao->create();
 		if($_POST['roomid'] == 0) {
 			$id = $dao->add();

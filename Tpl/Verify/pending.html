@@ -254,6 +254,10 @@ function act(title, action, hint) {
 							<br/>
 							<label>活动内容：</label>
 							<pre>{$order.info.content}</pre>
+							<?php if(isset($order['info']['secure'])) { ?>
+								<label>安保措施：</label>
+								<pre>{$order.info.secure}</pre>
+							<?php } ?>
 							<button class="btn" onclick="accept({$order.orderid})" style="font-weight: bold">批准</button>
 							<button class="btn" onclick="reject({$order.orderid})">驳回</button>
 							<?php if(isset($conflict[$order['orderid']])) { ?>

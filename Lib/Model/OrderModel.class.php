@@ -1,5 +1,30 @@
 <?php
 class OrderModel extends Model {
+	
+	public function autoReject() {
+		$sql = D('RoomStatus')->alias('S')->where('`S`.`room` = `O`.`room` AND `S`.`time` >= `O`.`date` * 100 + `O`.`starthour` AND `S`.`time` <= `O`.`date` * 100 + `O`.`endhour`')->buildSql();
+		$where['_string'] = 'EXISTS ' . $sql;
+		$where['isverified'] = array(0,3,'or');
+		$res = $this->alias('O')->where($where)->field('orderid')->select();
+		if($res) {
+			foreach($res as $f) {
+				$this->reject(0, $f['orderid'], '与其他审批通过的预约或锁定时间表冲突');
+			}
+		}
+	}
+
+	public function autoAccept() {
+		$sql = D('Room')->where(array('autoverify'=>'1'))->field('roomid')->buildSql();
+		$where['_string'] = '`room` IN ' . $sql;
+		$where['isverified'] = array(0,3,'or');
+		$res = $this->where($where)->field('orderid')->select();
+		if($res) {
+			foreach($res as $f) {
+				$this->accept(0, $f['orderid'], '系统自动审核通过');
+			}
+		}
+	}
+
 	public function accept($uid, $orderid, $comment) {
 		$VDao = D('Verify');
 		if($VDao->where(array('orderid'=>$orderid, 'verifier'=>$uid))->count())

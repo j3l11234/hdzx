@@ -43,4 +43,19 @@ class IndexAction extends BaseAction {
 		$_SESSION['feedbackLimit'] = NOW + 30;
 		$this->success('反馈留言已发送，回复将发往您的邮箱', $_SERVER['HTTP_REFERER']);
 	}
+
+	public function checkout() {
+		if(PRV('checkout')) {
+			$this->redirect('Order/query');
+		} else {
+			$this->redirect('User/login',array('prev'=>'Index:checkout'));
+		}
+	}
+
+	public function room($id) {
+		$room = D('Room')->where(array('roomid'=>$id))->select();
+		$this->assign('title', '房间介绍');
+		$this->assign('room', $room[0]);
+		$this->display();
+	}
 }

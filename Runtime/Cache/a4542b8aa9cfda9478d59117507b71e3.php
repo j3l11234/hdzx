@@ -137,6 +137,7 @@ function changeDate(dateText) {
 }
 function commit() {
 	if(!$('#confess').attr('checked')) {
+		alert('请同意遵守管理条例');
 		$('#confess').next('label').animate({marginLeft: 10}, 100).animate({marginLeft: 0}, 100).animate({marginLeft: 10}, 100).animate({marginLeft: 0}, 100);
 		return;
 	}
@@ -150,7 +151,7 @@ function commit() {
 	}, 'HTML');
 }
 </script><div class="float-fix"><div style="float: right; width: 35%" class="nav-bar"><div class="nav-bar2"><div class="nav-bar3"><a class="active">您正在预约...</a><div style="text-align: center; padding: 10px; padding-right: 50px; color: #222"><br/><strong><?php echo ($room["name"]); ?></strong> (<?php echo ($room["number"]); ?>)
-					<br/><br/><a href="<?php echo U('Index/room', array('id'=>$roomid));?>" target="_blank">查看房间简介</a><br/><br/><br/><input type="checkbox" id="confess"/><label for="confess" style="font-size: 13px; color: #222;">我同意遵守学生活动服务中心<a href="<?php echo ($readme); ?>" target="_blank">管理条例</a></label><br/><br/><button class="btn" onclick="commit()">提交申请表单</button><br/><i>表单提交后还要经过邮箱认证才会真的提交</i><?php if($room['maxhour'] > 0 && $room['maxhour'] < 14) { ?><br/><br/><i>本房间单个预约最多可申请 <?php echo ($room["maxhour"]); ?> 小时</i><?php } if($room['autoverify']) { ?><br/><br/><i>本房间预约由系统自动审核，如无冲突将自动通过</i><?php } ?></div></div></div></div><form id="orderForm" style="float: left; width: 63%"><input type="hidden" name="room" value="<?php echo ($room["roomid"]); ?>"/><input type="hidden" name="roomname" value="<?php echo ($room["name"]); ?> (<?php echo ($room["number"]); ?>)"/><a name="form-top" class="form-content" style="color: #222">
+					<br/><br/><a href="<?php echo U('Index/room', array('id'=>$roomid));?>" target="_blank">查看房间简介</a><br/><br/><br/><input type="checkbox" id="confess"/><label for="confess" style="font-size: 13px; color: #222;">我同意遵守学生活动服务中心<a href="<?php echo ($readme); ?>" target="_blank">管理条例</a></label><br/><br/><button class="btn" onclick="commit()">提交申请表单</button><br/><i>表单提交后还要经过邮箱认证才会真的提交</i><?php if($room['maxhour'] > 0 && $room['maxhour'] < 14) { ?><br/><br/><i>本房间单个预约最多可申请 <?php echo ($room["maxhour"]); ?> 小时</i><?php } if($room['autoverify']) { ?><br/><br/><i>本房间预约由系统自动审核，如无冲突将自动通过</i><?php } ?></div></div></div></div><form id="orderForm" style="float: left; width: 63%"><input type="hidden" name="room" value="<?php echo ($room["roomid"]); ?>"/><input type="hidden" name="roomname" value="<?php echo ($room["name"]); ?> (<?php echo ($room["number"]); ?>)"/><a name="div-top" class="form-content" style="color: #222">
 			请认真填写以下预约表格，申请人学号必须是北京交通大学在校学员的学号。
 		</a><div class="ribbon"><div class="padding">
 			1. 预约人基本资料

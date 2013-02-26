@@ -1,9 +1,9 @@
 <?php
 class VerifyAction extends BaseAction {
-	public function __construct() {
-		PRV(false, true);
+
+	public function _initialize() {
 		if(PRV('verify') === false)
-			$this->redirect('User/login');
+			$this->redirect('User/login', array('prev'=>'Verify:index'));
 	}
 
 	public function index() {
@@ -115,7 +115,7 @@ class VerifyAction extends BaseAction {
 			$where['date'] = array('elt', $date);
 		}
 		if($roomtype) {
-			$roomtype = base64_decode(htmlspecialchars_decode($roomtype));
+			$roomtype = urldecode($roomtype);
 			$sql = D('Room')->where(array('type'=>$roomtype))->field('roomid')->buildSql();
 			$where['_string'] .= ' AND `room` IN ' . $sql;
 		}
@@ -140,7 +140,7 @@ class VerifyAction extends BaseAction {
 		$this->assign('school', $schList);
 		$roomType = array();
 		foreach(D('Room')->types() as $v) {
-			$roomType[htmlspecialchars(base64_encode($v))] = $v;
+			$roomType[urlencode($v)] = $v;
 		}
 		$this->assign('roomtype', $roomType);
 		$this->assign('title', '过往审批记录');

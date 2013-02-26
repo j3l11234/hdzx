@@ -1,58 +1,56 @@
 <?php
 class OrderAction extends BaseAction {
 	// show the list of rooms
-	public function index() {
-		D('RoomStatus')->refresh();
+	public function index($page=1, $name='', $date='', $start=8, $end=22, $floor=0, $type=0) {
+		$param = array(
+			'name' => $name,
+			'date' => $date,
+			'start' => $start,
+			'end' => $end,
+			'floor' => $floor,
+			'type' => $type,
+			'page' => $page
+		);
+		$this->assign('param', $param);
 		$dao = D('Room');
 		$where = array();
-		if(isset($_POST['name']) && ($_POST['name'] = trim($_POST['name']))) {
+		if($name) {
 			$where['_complex'] = array();
-			$names = preg_split('/[ \.\,\;\|\/\-_\\\\]+/', $_POST['name']);
+			$where['_complex']['_logic'] = 'or';
+			$numbers = preg_split('/[^0-9]+/', $name);
+			$where['_complex']['number'] = array('IN', $numbers);
+			$names = preg_split('/[ \.\,\;\|\/\-_\\\\]+/', $name);
 			foreach($names as $k => $v) {
 				$names[$k] = array('like', '%' . $v . '%');
 			}
 			$names[] = 'or';
 			$where['_complex']['name'] = $names;
-			$numbers = preg_split('/[^0-9]+/', $_POST['name']);
-			$where['_complex']['number'] = array('IN', $numbers);
-			$where['_complex']['_logic'] = 'or';
 		}
-		if(isset($_POST['date']) && ($_POST['date'] = trim($_POST['date']))
-			&& isset($_POST['timestart']) && ($_POST['timestart'] = trim($_POST['timestart']))
-			&& isset($_POST['timeend']) && ($_POST['timeend'] = trim($_POST['timeend'])) ) {
+		if($date && $start && $end) {
 			$m = D('RoomStatus');
-			$date = str_replace('-', '', $_POST['date']);
-			$start = ($date . ($_POST['timestart'] < 10 ? '0' : '') . $_POST['timestart']) * 1;
-			$end = ($date . ($_POST['timeend'] < 10 ? '0' : '') . $_POST['timeend']) * 1;
+			$date = str_replace('-', '', $date);
+			$start = $date * 100 + $start;
+			$end = $date * 100 + $end;
 			$sql = $m->where(array(
 				'time' => array(array('egt', $start), array('lt', $end))
 			))->field('room')->buildSql();
 			$where['_string'] = '`roomid` NOT IN ' . $sql;
-			$this->assign('tstart', $_POST['timestart']);
-			$this->assign('tend', $_POST['timeend']);
-		} else {
-			$this->assign('tstart', 8);
-			$this->assign('tend', 22);
 		}
-		if(isset($_POST['floor']) && ($_POST['floor'] = trim($_POST['floor']) )) {
-			$where['floor'] = $_POST['floor'];
-			$this->assign('floor', $_POST['floor']);
-		} else {
-			$this->assign('floor', '0');
+		if($floor) {
+			$where['floor'] = $floor;
 		}
-		if(isset($_POST['type']) && ($_POST['type'] = trim($_POST['type']) )) {
-			$where['type'] = $_POST['type'];
-			$this->assign('type', $_POST['type']);
-		} else {
-			$this->assign('type', '0');
+		if($type) {
+			$type = urldecode($type);
+			$where['type'] = $type;
+			$this->assign('type', $type);
 		}
-		if($where) {
-			if(count($where) == 1 && isset($where['_complex']))
-				$where = $where['_complex'];
-			$dao->where($where);
-		}
-		$rooms = $dao->order('number')->select();
+		$where['isopen'] = 1;
+		$perPage = 10;
+		$rooms = $dao->where($where)->order('number')->page($page)->limit($perPage)->select();
 		$this->assign('rooms', $rooms);
+
+		$count = $dao->where($where)->count();
+		$this->assign('pageTotal', ceil($count / $perPage));
 
 		$dates = array();
 		$day = strtotime(TODAY);
@@ -75,7 +73,7 @@ class OrderAction extends BaseAction {
 		
 		$types = array();
 		foreach(D('Room')->types() as $type) {
-			$types[$type] = $type;
+			$types[urlencode($type)] = $type;
 		}
 		$this->assign('roomTypes', $types);
 
@@ -158,7 +156,7 @@ class OrderAction extends BaseAction {
 					'contact' => '预约人联系方式',
 					'date' => array('日期', '$$ > '. TODAY),
 					'starthour' => array('开始时间', '$$ > 7', '开始时间无效'),
-					'endhour' => array('结束时间', '($$ -= 1) < 22', '结束时间无效'),
+					'endhour' => array('结束时间', '($$ -= 1) < 22 && $$ >= $_POST["starthour"]', '结束时间无效'),
 					'topic' => array('活动主题', 'isset($${7})', '活动主题太短'),
 					'content' => array('活动内容', 'isset($${7})', '活动内容太短'),
 					'unit' => '举办单位',
@@ -191,6 +189,16 @@ class OrderAction extends BaseAction {
 					die($param[0] . '格式不正确');
 				}
 			}
+		}
+		$room = D('Room')->where(array('roomid'=>$_POST['room']))->field('info', true)->select();
+		if(!$room) {
+			die('本房间不存在');
+		}
+		$room = $room[0];
+		if(!$room['isopen'])
+			die('本房间不开放申请');
+		if($_POST['endhour'] - $_POST['starthour'] >= $room['maxhour']) {
+			die('本房间单个预约最多可预定 ' . $room['maxhour'] . ' 个小时');
 		}
 
 		$data = array();
@@ -230,7 +238,8 @@ class OrderAction extends BaseAction {
 	// check order status
 	public function query($id='') {
 		if($id) {
-			$result = D('Order')->where(array('date'=>array('egt', TODAY), 'orderer'=>$id))->select();
+			$result = D('Order')->order('`isverified` = 1 desc, ISNULL(`checkouttime`) desc, `orderid` asc')
+				->where(array('date'=>array('egt', TODAY), 'orderer'=>$id))->select();
 			$this->assign('id', $id);
 		} else {
 			$result = false;

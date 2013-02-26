@@ -1,0 +1,39 @@
+<script type="text/javascript">
+var doAction = false;
+function changepwd() {
+	if(doAction)
+		return false;
+	doAction = true;
+	$.post('{:U('dochange')}', $('#pwdForm').serialize(), function(result) {
+		doAction = false;
+		if(result == 'ok')
+			document.location.href = '{$prev}';
+		else {
+			$('#error_msg').html(result);
+			$('#error_msg').animate({textIndent:10}, 100)
+							.animate({textIndent:0}, 100)
+							.animate({textIndent:10}, 100)
+							.animate({textIndent:0}, 100)
+		}
+	}).error(function() {
+		doAction = false;
+	});
+	return false;
+}
+</script>
+<form onsubmit="return changepwd()" id="pwdForm" style="padding: 20px; text-align: center">
+	<h2 style="color: #F00; font-size: 15px" id="error_msg">{$msg}</h2>
+	<h1>账户密码修改</h1>
+	<label>原始密码：</label>
+	<input type="password" name="password" class="field"/>
+	<br/>
+	<label>新设密码：</label>
+	<input type="password" name="newpwd" class="field"/>
+	<br/>
+	<label>密码确认：</label>
+	<input type="password" name="newpwd2" class="field"/>
+	<br/>
+	<br/>
+	<input type="submit" style="visibility: hidden" value="登录"/>
+	<button onclick="changepwd()" class="btn">登录</button>
+</form>

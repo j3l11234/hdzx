@@ -4,7 +4,7 @@
 <script type="text/javascript">
 var timeSlide;
 $(function() {
-	$('.roomitem:odd').css('background', '#FFF');
+	$('.roomitem:even').css('background', '#FFF');
 	var delay = false;
 	var mt = $('.nav-bar').offset().top;
 	function placeBar () {
@@ -79,9 +79,32 @@ function timeChange() {
 	$('#timeend').val(t + 1);
 	$('.slider').slider('values', 1, t);
 }
+var lll;
+function search() {
+	return true;
+	var p = $('#searchbar').serializeArray();
+	<?php
+		$xparam = array(
+			'name' => '$name$',
+			'date' => '$date$',
+			'start' => '$start$',
+			'end' => '$end$',
+			'floor' => '$floor$',
+			'type' => '$type$'
+		);
+	?>
+	var url = '{:U('index', $xparam)}';
+	for(i in p) {
+		if(!p[i].value)
+			p[i].value = 'false';
+		url = url.replace('$' + p[i].name + '$', p[i].value);
+	}
+	document.location.href = url;
+	return false;
+}
 </script>
 <div class="float-fix">
-	<form method="post" action="{:__ACTION__}" class="nav-bar" style="float: right; width: 30%; margin-right: 10px;">
+	<form id="searchbar" action="{:U('index')}" method="get" onsubmit="return search()" class="nav-bar" style="float: right; width: 30%; margin-right: 10px;">
 		<div class="nav-bar2">
 			<div class="nav-bar3">
 				<a class="active">
@@ -89,20 +112,20 @@ function timeChange() {
 				</a>
 				<div class="tool-box">
 					<label>房间名/号:</label>
-					<input type="text" class="field" style="width:150px" name="name" value="{$_POST.name}"/>
+					<input type="text" class="field" style="width:150px" name="name" value="{$param.name}"/>
 				</div>
 				<a class="active">
 					房间可预约时间检索
 				</a>
 				<div class="tool-box">
 					<label>日期:</label>
-					<input type="text" name="date" class="field datepicker" readonly style="width: 150px;" value="{$_POST.date}"/>
+					<input type="text" name="date" class="field datepicker" readonly style="width: 150px;" value="{$param.date}"/>
 					<a href="javascript:void(0)" onclick="$('.datepicker').val('')">清除</a>
 					<br/>
 					<label>时段：</label>
-					<input type="text" class="plaintext" name="timestart" id="timestart" value="{$tstart}" onchange="timeChange()"/>
+					<input type="text" class="plaintext" name="start" id="timestart" value="{$param.start}" onchange="timeChange()"/>
 					点 到
-					<input type="text" class="plaintext" name="timeend" id="timeend" value="{$tend}" onchange="timeChange()"/>
+					<input type="text" class="plaintext" name="end" id="timeend" value="{$param.end}" onchange="timeChange()"/>
 					点
 					<div class="slider" style="margin: 10px; z-index: 0"></div>
 				</div>
@@ -113,18 +136,18 @@ function timeChange() {
 					<label>类型:</label>
 					<select name="type">
 						<option value="0">任意</option>
-						{:options($roomTypes, $type)}
+						{:options($roomTypes, $param['type'])}
 					</select>
 					&nbsp;&nbsp;&nbsp;
 					<label>楼层:</label>
 					<select name="floor">
 						<option value="0">任意</option>
-						{:options($floors, $floor)}
+						{:options($floors, $param['floor'])}
 					</select>
 				</div>
 				<div class="hr"></div>
 				<div class="tool-box" style="text-align: center">
-					<button class="btn" onclick="submit()">按以上条件检索</button><br/>
+					<button class="btn" onclick="search()">按以上条件检索</button><br/>
 					<i>表格中未填写内容不参与检索</i>
 				</div>
 			</div>
@@ -152,7 +175,8 @@ function timeChange() {
 			</tr></table>
 		</div>
 		<div id="timedrag" class="timelist float-fix">&nbsp;</div>
-		<div style="height: 35px"></div>
+		{~$xparam = $param; $xparam['page'] = ''; $xparam = U('index') . '?' . http_build_query($xparam) . '$$'}
+		<div class="pager" style="padding: 5px; padding-top:40px;">{:show_pager($pageTotal, $param['page'], $xparam)}</div>
 		<?php foreach($rooms as $room) { ?>
 		<div class="float-fix roomitem">
 			<table style="650px" cellspacing="0" cellpadding="0"><tr>

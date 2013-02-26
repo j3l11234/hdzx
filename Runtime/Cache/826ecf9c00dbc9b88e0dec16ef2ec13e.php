@@ -98,7 +98,7 @@ $(function() {
 	myslide.play();
 });
 </script><div class="slide-show"><ul><?php foreach($slide as $item) { ?><li>__PUBLIC__/images/slides/<?php echo ($item); ?></li><?php } ?></ul><div class="content"><div class="content-slide"></div></div><div class="pager"></div><div class="head"></div><div class="foot"></div><a class="next" href="javascript:void(0)" onclick="myslide.next()"></a><a class="prev" href="javascript:void(0)" onclick="myslide.prev()"></a></div><div class="float-fix"><div class="tip-left"><h3>简单易用的全新申请系统</h3><p>
-			查询房间、填写表单、邮箱验证，简单3步即可完成场地申请。<br/><a href="">点击这里</a> 开始预约场地
+			查询房间、填写表单、邮箱验证，简单3步即可完成场地申请。<br/><a href="<?php echo U('Order/index');?>">点击这里</a> 开始预约场地
 		</p></div><div class="tip-right"><h3>更加人性化的管理系统</h3><p>
 			全面改善了所有类型管理者的操作界面，<br/>
 			重新实现的预约冲突分析系统更加准确有效

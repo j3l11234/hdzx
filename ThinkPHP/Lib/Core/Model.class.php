@@ -534,7 +534,7 @@ class Model {
             // 自动获取表名
             $options['table']   =   $this->getTableName();
         if(!empty($options['alias'])) {
-            $options['table']  .=   ' '.$options['alias'];
+            $options['table']  =   '`'.$options['table'].'` `'.$options['alias'].'`';
         }
         // 记录操作的模型名称
         $options['model']       =   $this->name;

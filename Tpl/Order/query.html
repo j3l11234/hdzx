@@ -39,13 +39,17 @@ pre {
 					<br/>
 					<i>注意：只有预约日期在今日或之后才会显示</i>
 				</form>
+				<?php if(PRV('checkout')) { ?>
+					<div style="padding: 10px; padding-right: 50px; text-align: center">
+						<br/><br/>
+						<a href="{:U('User/logout')}"><button class="btn">注销</button></a>
+					</div>
+				<?php } ?>
 			</div>
 		</div>
 	</div>
 	<div style="float: left; width: 63%; line-height: 40px; color: #222;">
-		<?php
-			$status = array('待审核', '审核通过', '审核驳回');
-		?>
+		<?php $status = array('待审核', '审核通过', '审核驳回', '待校级审核'); ?>
 		<?php $i = 0; foreach($orders as $order) { $i++; $order['info'] = json_decode($order['info'], true); ?>
 			<div class="ribbon"><div class="padding">
 				{$i}. {$order.info.topic}
@@ -65,8 +69,6 @@ pre {
 					{$order.starthour}点 - {:$order['endhour'] + 1}点
 				</b>
 				<br/>
-				<label>活动内容：</label>
-				<pre>{$order.info.content}</pre>
 				<label>审批状态：</label>
 				<b>{$status[$order['isverified']]}</b>
 				<?php if($order['isverified'] == 1) { ?>
@@ -87,12 +89,17 @@ pre {
 	</div>
 </div>
 <?php } else { ?>
-<form onsubmit="return go()" style="text-align: center; padding-bottom: 50px;">
-	<h1>请输入学号</h1>
-	<input type="text" class="field" id="id"/>
-	<button class="btn" onclick="go()">查询</button>
-	<?php if($id) { ?>
-		<div style="color: #F00">没有找到符合条件尚未过期的预约</div>
+	<form onsubmit="return go()" style="text-align: center; padding-bottom: 30px;">
+		<h1>请输入学号</h1>
+		<input type="text" class="field" id="id"/>
+		<button class="btn" onclick="go()">查询</button>
+		<?php if($id) { ?>
+			<div style="color: #F00">没有找到符合条件尚未过期的预约</div>
+		<?php } ?>
+	</form>
+	<?php if(PRV('checkout')) { ?>
+		<div style="padding: 20px; text-align: center">
+			<a href="{:U('User/logout')}"><button class="btn">注销</button></a>
+		</div>
 	<?php } ?>
-</form>
 <?php } ?>

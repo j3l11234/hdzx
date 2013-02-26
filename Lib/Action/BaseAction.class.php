@@ -1,5 +1,12 @@
 <?php
 class BaseAction extends Action {
+	
+	public function __construct() {
+		Action::__construct();
+		D('Order')->autoReject();
+		D('Order')->autoAccept();
+		D('RoomStatus')->refresh();
+	}
 
 	public function display() {
 		$navi = array();

@@ -140,6 +140,7 @@ function changeDate(dateText) {
 }
 function commit() {
 	if(!$('#confess').attr('checked')) {
+		alert('请同意遵守管理条例');
 		$('#confess').next('label').animate({marginLeft: 10}, 100).animate({marginLeft: 0}, 100).animate({marginLeft: 10}, 100).animate({marginLeft: 0}, 100);
 		return;
 	}
@@ -184,7 +185,7 @@ function commit() {
 	<form id="orderForm" style="float: left; width: 63%">
 		<input type="hidden" name="room" value="{$room.roomid}"/>
 		<input type="hidden" name="roomname" value="{$room.name} ({$room.number})"/>
-		<a name="form-top" class="form-content" style="color: #222">
+		<a name="div-top" class="form-content" style="color: #222">
 			请认真填写以下预约表格，申请人学号必须是北京交通大学在校学员的学号。
 		</a>
 		<div class="ribbon"><div class="padding">
