@@ -1,4 +1,5 @@
 <?php
+return;
 include "Mail.php";
 function sendmail($to, $subject, $body) {
 	$from = " \"学生活动服务中心\" <xshdzx@bjtu.edu.cn>";
