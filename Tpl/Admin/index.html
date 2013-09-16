@@ -1,29 +1,93 @@
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/jqueryui.css"/>
+<script type="text/javascript" src="__PUBLIC__/jqueryui.js"></script>
+<script type="text/javascript">
+$(function() {
+    $('.selDate').datepicker({maxDate:'+0D', onSelect: query, changeMonth: true, changeYear: true});
+    $.get('{:U('Query/roomtypes')}', function(result) {
+        for(k in result) {
+            $('#roomType').append('<option value="' + (k * 1 + 1) + '">' + result[k] + '</option>');
+        }
+    }, "JSON");
+    $.get('{:U('Query/schools')}', function(result) {
+        for(k in result) {
+            $('#schools').append('<option value="' + k + '">' + result[k] + '</option>');
+        }
+    }, "JSON");
+    query();
+    $('.sField').change(query);
+    $('.sField').blur(query);
+});
+var request = false;
+function query() {
+    var param = {
+        'school':$('#schools').val(),
+        'roomType':$('#roomType').val(),
+        'dateStart':$('#startDate').val(),
+        'dateEnd':$('#endDate').val()
+    };
+    if(request)
+        request.abort();
+    request = $.post('{:U('stats')}', param, function(result) {
+        request = false;
+        for(k in result) {
+            $('.' + k).html(result[k]);
+        }
+    }, "JSON");
+}
+</script>
+<style type="text/css">
+.selDate {
+    width: 100px;
+}
+.ui-datepicker {
+    font-size: 14px;
+}
+</style>
 <br/>
 <fieldset>
-	<legend>总量统计</legend>
+	<legend>
+        <select id="schools" class="sField">
+            <option value="">全校</option>
+        </select>
+        范围
+        <select id="roomType" class="sField">
+            <option value="">全部</option>
+        </select>
+        房间类型 
+        从
+        <input type="text" id="startDate" class="selDate sField" value="{:date('Y', NOW)-3}-01-01" readonly/>
+        到
+        <input type="text" id="endDate"  class="selDate sField" value="{:date('Y-m-d', NOW)}" readonly/>
+        的统计
+    </legend>
+
 
 	<label>预约总量：</label>
-	<b>{$orderTotalCount}</b>
+	<b class="oTotal"></b>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<label>通过预约：</label>
-	<b>{$orderPassTotalCount}</b>
+	<b class="oAccept"></b>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<label>用户反馈量：</label>
-	<b>{$feedbackCount}</b>
+	<label>自动通过预约：</label>
+	<b class="oAutoAccept"></b>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<label>房屋数量：</label>
-	<b>{$roomCount}</b>
+	<label>自动驳回预约：</label>
+	<b class="oAutoReject"></b>
+    </br>
+    <h3>预约包含关键字</h3>
+	<label>自习/练习/学习：</label>
+	<b class="oTagStudy"></b>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<label>比赛/竞赛/大赛：</label>
+	<b class="oTagCompetition"></b>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<label>讨论/会议/开会：</label>
+	<b class="oTagMeeting"></b>
+    <br/>
+	<label>演讲/表演/文艺：</label>
+	<b class="oTagPresentation"></b>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<label>合唱/排练/彩排：</label>
+	<b class="oTagRehearsal"></b>
 </fieldset>
-<br/>
-<fieldset>
-	<legend>本月统计</legend>
-
-	<label>预约总量：</label>
-	<b>{$orderMonthCount}</b>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<label>通过预约：</label>
-	<b>{$orderPassMonthCount}</b>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<label>用户反馈量：</label>
-	<b>{$feedbackMonthCount}</b>
-</fieldset>
+<h4 style="color: #F55">提示：admin账号已被保护无法删除或修改其权限，且具有权限审批、查询任意申请单（在<a href="{:U('Verify/history')}" target="_blank">预约审核</a>模块进行）</h4>

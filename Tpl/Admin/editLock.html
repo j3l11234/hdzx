@@ -167,6 +167,8 @@ function remove() {
 						<?php
 							if(!isset($field['type']))
 								$field['type'] = 'text';
+                            if(isset($field['type'][0]) && is_numeric($lock[$k]))
+                                $lock[$k] *= 1;
 							if(is_array($field['type'])) { ?>
 							<select name="{$k}">
 							{:options($field['type'], $lock[$k])}

@@ -2,8 +2,16 @@ body {
 	background: #2D1709 url(images/bodyBg.jpg) repeat-x 140px 0;
 	margin: 10px;
 	font-size: 14px;
-	color: #595959;
+	color: #333;
 	font-family: arial;
+}
+
+pre {
+	white-space:pre-wrap;
+	white-space:-moz-pre-wrap;
+	white-space:-pre-wrap;
+	white-space:-o-pre-wrap;
+	word-wrap:break-word;
 }
 
 a {
@@ -124,7 +132,7 @@ i {
 
 .logo .logotext {
 	background: url(images/logotext.png) no-repeat left 50px;
-	width: 651px;
+	width: 741px;
 	height: 128px;
 	margin-left: 30px;
 }

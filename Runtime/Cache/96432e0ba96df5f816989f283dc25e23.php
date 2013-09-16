@@ -7,7 +7,5 @@
 						内容等均由校团委及其授权的协助管理者<br/>
 						负责维护、管理。
 					</div><div class="split"></div><div><h2>维护者通道</h2><p><a href="<?php echo U('Admin/index');?>">系统总管理</a><a href="<?php echo U('Verify/index');?>">预约审核</a><a href="<?php echo U('Index/checkout');?>">开门条发放</a></p><h2>联系方式</h2>
-						邮箱：hdzx@bjtu.edu.cn &nbsp;&nbsp;&nbsp; 电话：(010) 1234 - 5678
-					</div></div><div class="foot">
-					Copyleft 2013，版权没有，效仿不究，但请协助改进本作品
-				</div></div></div></body></html>
+						邮箱：hdzx@bjtu.edu.cn &nbsp;&nbsp;&nbsp; 电话：(010) 5168 - 5954
+					</div></div><div class="foot"></div></div></div></body></html>

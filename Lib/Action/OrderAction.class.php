@@ -45,7 +45,7 @@ class OrderAction extends BaseAction {
 			$this->assign('type', $type);
 		}
 		$where['isopen'] = 1;
-		$perPage = 10;
+		$perPage = 7;
 		$rooms = $dao->where($where)->order('number')->page($page)->limit($perPage)->select();
 		$this->assign('rooms', $rooms);
 
@@ -55,7 +55,7 @@ class OrderAction extends BaseAction {
 		$dates = array();
 		$day = strtotime(TODAY);
 		$weekday = array('周日', '周一', '周二', '周三', '周四', '周五', '周六');
-		for($i = 0; $i < 15; $i++) {
+		for($i = 0; $i < 11; $i++) {
 			$str = date('Y-m-d ', $day);
 			$str .= $i == 0 ? '今天' : $weekday[date('w', $day)];
 			$dates[] = $str;
@@ -90,6 +90,8 @@ class OrderAction extends BaseAction {
 
 	// display order form
 	public function order($room, $date) {
+        if($date <= TODAY)
+            $this->success('必须至少提前一天预约！');
 		if(isset($_SESSION['pendingorder']) && $_SESSION['pendingorder'])
 			$this->redirect('pendingorder');
 		$this->assign('title', '房间预约');
@@ -110,10 +112,11 @@ class OrderAction extends BaseAction {
 		$data = $_SESSION['pendingorder'];
 		$data['endhour'] -= 1;
 		$url = 'http://' . $_SERVER['HTTP_HOST'] . U('confirm', array('key'=>$data['key']));
+		$date = substr($data['date'], 0, 4) . '-' . substr($data['date'], 4, 2) . '-' . substr($data['date'], 6, 2);
 		sendmail($data['orderer'] . '@bjtu.edu.cn',
 			'学生活动服务中心预约验证',
-			"您正在预约{$data['info']['roomname']} {$data['starthour']}点 - {$data['endhour']}点
-			<a href='{$url}' target='_blank'>点击这里</a>或直接访问 {$url} 完成验证。");
+			"您正在预约{$data['info']['roomname']} {$date} {$data['starthour']}点 - {$data['endhour']}点。
+			访问链接： {$url} 完成验证。");
 	}
 
 	// display pending order
@@ -122,9 +125,9 @@ class OrderAction extends BaseAction {
 			$this->success('没有未完成验证的预约', 'Index/index');
 		if($sendmail) {
 			if(isset($_SESSION['maildelay']) && $_SESSION['maildelay'] > NOW) {
-				$this->success('为防止恶意攻击，重发邮件操作必须至少间隔30秒', 'pendingorder');
+				$this->success('为防止恶意攻击，发邮件操作必须至少间隔15秒', 'pendingorder');
 			}
-			$_SESSION['maildelay'] = NOW + 30;
+			$_SESSION['maildelay'] = NOW + 15;
 			$this->sendOrderMail();
 			$this->assign('title', '预约验证邮件已发送');
 		} else {
@@ -154,7 +157,7 @@ class OrderAction extends BaseAction {
 					'ordererid' => array('预约人学号', '/^[0-9]{8}$/'),
 					'orderer' => array('预约人姓名', 'isset($${4})'),
 					'contact' => '预约人联系方式',
-					'date' => array('日期', '$$ > '. TODAY),
+					'date' => array('日期', '$$ > '. TODAY, '预约日期必须至少提前一天'),
 					'starthour' => array('开始时间', '$$ > 7', '开始时间无效'),
 					'endhour' => array('结束时间', '($$ -= 1) < 22 && $$ >= $_POST["starthour"]', '结束时间无效'),
 					'topic' => array('活动主题', 'isset($${7})', '活动主题太短'),
@@ -232,7 +235,7 @@ class OrderAction extends BaseAction {
 		$data['info'] = json_encode($data['info']);
 		unset($data['key']);
 		M('Order')->add($data);
-		$this->success('预约验证完成，审核结果会发往您的邮箱', 'Index/index');
+		$this->success('预约验证完成，审核结果会发往您的邮箱', U('query', array('id'=>$data['orderer'])));
 	}
 
 	// check order status
@@ -258,6 +261,47 @@ class OrderAction extends BaseAction {
 				'result' => true,
 				'date' => date('Y-m-d H:i:s', NOW)
 			)));
+	}
+	
+	// remove existing order
+	public function remove($id) {
+		$data = D('Order')->where(array('orderid'=>$id))->select();
+		if($data) {
+			$data = $data[0];
+			$returnUrl = U('query', array('id'=>$data['orderer']));
+			if(isset($_SESSION['deldelay']) && $_SESSION['deldelay'] > NOW) {
+				$this->success('为防止恶意攻击，删除操作至少间隔60秒', $returnUrl);
+			}
+			$_SESSION['deldelay'] = NOW + 60;
+			$data['info'] = json_decode($data['info'], true);
+			$oprval = json_encode(array('delete'=>NOW, 'id'=>$id, 'orderer'=>$data['orderer']));
+			$key = substr(md5($oprval), 11, 16);
+			if(!isset($_SESSION['del']))
+				$_SESSION['del'] = array();
+			$_SESSION['del'][$key] = $oprval;
+			$url = 'http://' . $_SERVER['HTTP_HOST'] . U('confirmremove', array('key'=>$key));
+			$date = substr($data['date'], 0, 4) . '-' . substr($data['date'], 4, 2) . '-' . substr($data['date'], 6, 2);
+			sendmail($data['orderer'] . '@bjtu.edu.cn',
+				'学生活动服务中心预约删除',
+				"您要删除预约{$data['info']['roomname']} {$date} {$data['starthour']}点 - {$data['endhour']}点。
+				访问链接： {$url} 完成删除操作验证。");
+			$this->success('删除操作需要邮箱验证，请查看您的邮箱', $returnUrl, 5);
+		} else {
+			$this->success('此预约不存在', 'query');
+		}
+	}
+
+	// confirm remove
+	public function confirmremove($key) {
+		$key = $key;
+		if(isset($_SESSION['del'][$key])) {
+			$data = json_decode($_SESSION['del'][$key], true);
+			unset($_SESSION['del'][$key]);
+			$id = $data['id'];
+			D('Order')->remove($id);
+			$this->success('删除操作完成', U('query', array('id'=>$data['orderer'])), 3);
+		}
+		$this->success('无效或过期的删除操作', 'query');
 	}
 }
 ?>

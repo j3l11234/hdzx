@@ -9,7 +9,23 @@
 			$('button.btn').each(function() {
 				$(this).html('<span>' + $(this).html() + '</span>');
 			});
-		});
+            var ctx = $('#banner');
+            ctx = ctx[0].getContext('2d');
+            ctx.shadowColor = '#333';
+            ctx.shadowOffsetX = -1;
+            ctx.shadowOffsetY = -1;
+            ctx.shadowBlur = 4;
+            ctx.font = 'bold 40px 微软雅黑';
+            var gradient = ctx.createLinearGradient(0,0, 200, 900);
+            gradient.addColorStop(0, '#AAA');
+            gradient.addColorStop(0.05, '#EEE');
+            gradient.addColorStop(0.2, '#BBB');
+            gradient.addColorStop(0.27, '#EEE');
+            gradient.addColorStop(1, '#AAA');
+            ctx.fillStyle = gradient;
+            ctx.fillText('北京交通大学  学生活动服务中心场地预约', 12, 92);
+            $('#banner2').attr('src', $('canvas')[0].toDataURL());
+        });
 		</script>
 		<title>{$title} - 学生活动服务中心</title>
 	</head>
@@ -33,5 +49,5 @@
 			</div>
 			<div class="page-body">
 				<div class="logo">
-					<div class="logotext"></div>
+					<canvas width="750" height="128" id="banner"></canvas>
 				</div>

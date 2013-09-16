@@ -21,5 +21,9 @@ class QueryAction extends Action {
 		}
 		die(json_encode($ret));
 	}
+    public function schools() {
+        $ret = D('School')->getList();
+        die(json_encode($ret));
+    }
 }
 ?>

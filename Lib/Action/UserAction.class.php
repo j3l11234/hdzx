@@ -9,6 +9,8 @@ class UserAction extends BaseAction {
 		if($prev === NULL) {
 			$prev = $_SERVER['HTTP_REFERER'];
 		} else {
+			if($prev == 'Index:checkout')
+				$this->assign('username', '开门条');
 			$prev = U(str_replace(':', '/', $prev));
 			if(PRV('userid'))
 				$this->assign('msg','您没有权限做此操作，请尝试其他账户');

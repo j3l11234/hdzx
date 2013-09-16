@@ -57,10 +57,10 @@ pre {
 	padding: 5px;
 }
 .approved {
-	background: url(__PUBLIC__/images/approved.png) no-repeat right center;
+	background: url(__PUBLIC__/images/approved.png) no-repeat right top;
 }
 .reject {
-	background: url(__PUBLIC__/images/reject.png) no-repeat right center;
+	background: url(__PUBLIC__/images/reject.png) no-repeat right top;
 }
 </style>
 <script type="text/javascript">
@@ -244,7 +244,16 @@ function search() {
 							<pre>{$order.info.content}</pre>
 							<label>审批结果：</label>
 							<b>{:($verify[$order['orderid']]['ispass'])?'批准':'驳回'}</b>
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							<label>审批者：</label>
+							<b>{:($verify[$order['orderid']]['username'])}</b>
 							<pre>{$verify[$order['orderid']]['comment']}</pre>
+							<button class="btn" onclick="$(this).parent().find('.regretUrl').show(100)">撤销审批决定</button>
+							【注意：此功能可能造成预约申请人的困惑，请谨慎使用】
+							<br/>
+							<a class="regretUrl" style="display: none; color: #F00;" href="{:U('regret', array('id'=>$verify[$order['orderid']]['verifyid']))}">
+								<button class="btn">坚决撤销！！</button>
+							</a>
 						</div>
 					</div>
 					<?php } ?>

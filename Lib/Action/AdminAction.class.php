@@ -77,6 +77,77 @@ class AdminAction extends Action {
 		$this->display();
 	}
 
+    // Statistics for json query
+    public function stats() {
+        function P($key, $default) {
+            if(isset($_POST[$key]))
+                return $_POST[$key];
+            return $default;
+        }
+        $school = P('school', 0);
+        $dateStart = str_replace('-', '', P('dateStart', 10000000));
+        $dateEnd = str_replace('-', '', P('dateEnd', 99999999));
+        $roomtype = P('roomType', 0);
+        $where = array();
+        if($school)
+            $where['school'] = $school;
+        if($dateStart && $dateEnd)
+            $where['date'] = array(
+                array('egt', $dateStart),
+                array('elt', $dateEnd)
+            );
+        if($roomtype) {
+            $type = D('Room')->types();
+            $roomtype = $type[$roomtype - 1];
+            $res = D('Room')->where(array('type'=>$roomtype))->field('roomid')->select();
+            if($res) {
+                $rids = array();
+                foreach($res as $v) {
+                    $rids[] = $v['roomid'];
+                }
+                $where['room'] = array('in', $rids);
+            }
+        }
+        $result = array();
+        $result['oTotal'] = D('Order')->where($where)->count();
+        $where['_string'] = 'isverified = 1';
+        $result['oAccept'] = D('Order')->where($where)->count();
+        $sql = D('Verify')->alias('V')->where('O.orderid = V.orderid and V.ispass = 1 and V.verifier = 0')->buildSql();
+        $where['_string'] = 'isverified = 1 and exists ' . $sql;
+        $result['oAutoAccept'] = D('Order')->alias('O')->where($where)->count();
+        $sql = D('Verify')->alias('V')->where('O.orderid = V.orderid and V.ispass = 0 and V.verifier = 0')->buildSql();
+        $where['_string'] = 'isverified = 0 and exists ' . $sql;
+        $result['oAutoReject'] = D('Order')->alias('O')->where($where)->count();
+        $result['rt'] = $roomtype;
+        
+        function I($arr) {
+            $ret = array();
+            foreach($arr as $v) {
+                $ret[] = 'info like '.str_replace('\\u', '__', json_encode('%'.$v.'%'));
+            }
+            return implode(' or ', $ret);
+        }
+        function PC($v, $t) {
+            return (ceil(1000 * $v / $t) / 10) . '%';
+        }
+        $where['_string'] = I(array('自习', '学习', '练习'));
+        $result['oTagStudy'] = D('Order')->where($where)->count();
+        $result['oTagStudy'] .= ' (' . PC($result['oTagStudy'], $result['oTotal']) . ')';
+        $where['_string'] = I(array('比赛', '大赛', '测试'));
+        $result['oTagCompetition'] = D('Order')->where($where)->count();
+        $result['oTagCompetition'] .= ' (' . PC($result['oTagCompetition'], $result['oTotal']) . ')';
+        $where['_string'] = I(array('讨论', '会议', '开会'));
+        $result['oTagMeeting'] = D('Order')->where($where)->count();
+        $result['oTagMeeting'] .= ' (' . PC($result['oTagMeeting'], $result['oTotal']) . ')';
+        $where['_string'] = I(array('演讲', '表演', '文艺'));
+        $result['oTagPresentation'] = D('Order')->where($where)->count();
+        $result['oTagPresentation'] .= ' (' . PC($result['oTagPresentation'], $result['oTotal']) . ')';
+        $where['_string'] = I(array('合唱', '排练', '彩排'));
+        $result['oTagRehearsal'] = D('Order')->where($where)->count();
+        $result['oTagRehearsal'] .= ' (' . PC($result['oTagRehearsal'], $result['oTotal']) . ')';
+        die(json_encode($result));
+    }
+
 	// configure list of schools
 	public function schools() {
 		$this->assign('schools', 
@@ -447,10 +518,16 @@ class AdminAction extends Action {
 		if(isset($_POST['password']))
 			$_POST['password'] = array('%MD5', $_POST['password']);
 		$dao = D('User');
+        $result = D('User')->where('`username`="admin"')->field('userid')->select();
+        $adminUid = $result[0]['userid'];
+        if($_POST['userid'] == $adminUid) {
+			$_POST['school'] = 0;
+			$_POST['isadmin'] = 1;
+			$_POST['ischeckout'] = 1;
+        }
 		$dao->create();
 		if(isset($_POST['userid']) && $_POST['userid']) {
 			$dao->save();
-			echo $dao->getLastSql();
 		} else {
 			$dao->add();
 			$this->success('用户添加成功', 'account');
@@ -459,7 +536,7 @@ class AdminAction extends Action {
 	}
 
 	public function deleteAccount($id) {
-		D('User')->where(array('userid'=>$id))->delete();
+		D('User')->where(array('userid'=>$id,'username'=>array('neq','admin')))->delete();
 	}
 }
 ?>

@@ -1,9 +1,13 @@
 <?php
 class VerifyAction extends BaseAction {
+    
+    private $adminUid;
 
 	public function _initialize() {
 		if(PRV('verify') === false)
 			$this->redirect('User/login', array('prev'=>'Verify:index'));
+        $result = D('User')->where('`username`="admin"')->field('userid')->select();
+        $this->adminUid = $result[0]['userid'];
 	}
 
 	public function index() {
@@ -13,7 +17,9 @@ class VerifyAction extends BaseAction {
 	public function pending() {
 		$this->assign('title', '待审核预约');
 		$school = PRV('verify');
-		if($school > 0) {
+        if(PRV('userid') == $this->adminUid) {
+            $where['isverified'] = array('IN', array(0,3));
+		} elseif($school > 0) {
 			$where['school'] = $school;
 			$where['isverified'] = 0;
 		} else {
@@ -89,6 +95,12 @@ class VerifyAction extends BaseAction {
 		$this->success('预约驳回成功', 'pending');
 	}
 
+    // regret a decision
+    public function regret($id) {
+        $result = D('Order')->regretVerify(PRV('userid'), ceil($id));
+        $this->success($result, 'history');
+    }
+
 	// display historical verify record
 	public function history($auto = 0, $page=1, $school=-1, $roomtype=0, $date=0) {
 		$this->assign('param', array(
@@ -98,12 +110,14 @@ class VerifyAction extends BaseAction {
 				'date' => $date,
 				'auto' => $auto
 			));
-		if(!$auto)
+		if(!$auto) {
 			$uid = PRV('userid');
-		else {
+            $vwh = PRV('userid') == $this->adminUid ? array('verifier'=>array('neq', 0)) : array('verifier'=>$uid);
+		} else {
 			$uid = 0;
+            $vwh = array('verifier'=>$uid);
 		}
-		$sql = D('Verify')->where(array('verifier'=>$uid))->field('orderid')->buildSql();
+		$sql = D('Verify')->where($vwh)->field('orderid')->buildSql();
 		$where['_string'] = '`orderid` IN ' . $sql;
 		if($school >= 0) {
 			if(PRV('verify') && $school != PRV('verify'))
@@ -130,8 +144,10 @@ class VerifyAction extends BaseAction {
 		}
 		$this->assign('orders', $result);
 		$verify = array();
-		$result = D('Verify')->where(array('orderid'=>array('IN', $ids)))->select();
+		$result = D('Verify')->alias('V')->join('`user` U on V.verifier = U.userid')->where($vwh)->field('V.*,U.username')->select();
 		foreach($result as $v) {
+            if($v['verifier'] == 0)
+                $v['username'] = '自动审核';
 			$verify[$v['orderid']] = $v;
 		}
 		$this->assign('verify', $verify);

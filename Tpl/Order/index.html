@@ -55,8 +55,8 @@ $(function() {
 			timelined.animate({marginLeft:0}, {duration: 300, step:function(now) {
 				tpos = now;
 			} });
-		} else if(tpos < -1000) {
-			timelined.animate({marginLeft:-1000}, {duration: 300, step:function(now) {
+		} else if(tpos < -600) {
+			timelined.animate({marginLeft:-600}, {duration: 300, step:function(now) {
 				tpos = now;
 			} });
 		}
@@ -188,8 +188,8 @@ function search() {
 				</td>
 				<td style="width: 500px;">
 					<div style="width: 500px; overflow: hidden">
-						<table class="timelined" style="width: 1500px" cellspacing="0" cellpadding="0"><tr>
-						<?php for($m=0; $m<15; $m++){ ?>
+						<table class="timelined" style="width: 1100px" cellspacing="0" cellpadding="0"><tr>
+						<?php for($m=0; $m<11; $m++){ ?>
 							<td>
 								<a class="timecell" href="{:U('order', array('room' => $room['roomid'], 'date'=>$rdates[$m]))}" target="_blank" title="点击这里在此日期申请此房间">
 									<?php
@@ -215,5 +215,6 @@ function search() {
 			</tr></table>
 		</div>
 		<?php } ?>
+		<div class="pager" style="padding: 5px; padding-bottom:20px;">{:show_pager($pageTotal, $param['page'], $xparam)}</div>
 	</div>
 </div>

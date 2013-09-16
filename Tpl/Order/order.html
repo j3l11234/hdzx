@@ -1,4 +1,16 @@
 <style type="text/css">
+.legend {
+	margin: 0;
+	padding: 0;
+}
+.legend li {
+	display: block;
+	font-size: 12px;
+	padding: 5px;
+	margin: 2px;
+	float: left;
+	color: #222;
+}
 .form-content {
 	margin-left: 20px;
 	padding: 17px;
@@ -23,10 +35,10 @@
 	-webkit-user-select: none;
 	-ms-user-select: none;
 }
-.timelist li.ordered {
+li.ordered {
 	background: #DAC;
 }
-.timelist li.restrict {
+li.restrict {
 	background: #397;
 	color: #FFF;
 }
@@ -47,7 +59,7 @@
 $(function() {
 	$('.timelist .ordered').attr('title', '已被预约');
 	$('.timelist .restrict').attr('title', '已被锁定');
-	$('.datepicker').datepicker({minDate: "+1D", maxDate: "+2W", onSelect: changeDate});
+	$('.datepicker').datepicker({minDate: "+1D", maxDate: "+10D", onSelect: changeDate});
 	var cdate = '<?php echo $date; ?>';
 	changeDate(cdate);
 	cdate = cdate.substr(0, 4) + '-' + cdate.substr(4, 2) + '-' + cdate.substr(6, 2);
@@ -124,7 +136,7 @@ function changeDate(dateText) {
 	$.get('{:U('Query/roomDayTimelist')}', {'room': <?php echo $roomid; ?>, 'date': dateText}, function(result) {
 		if(result) {
 			$('.timelist li').each(function() {
-				var k = $(this).html();
+				var k = $(this).html() * 1;
 				if(result[k] != undefined) {
 					if(result[k] == 1) {
 						$(this).addClass('restrict');
@@ -234,6 +246,13 @@ function commit() {
 					</ul>
 					<br/>
 					<i>用鼠标<u>划过</u>想要的时段，<br/>如在11按下在14松开代表11点到15点</i>
+					<ul class="legend float-fix">
+						<li style="font-weight:bold">图例：</li>
+						<li style="background:#AED">可用</li>
+						<li class="ordered">占用</li>
+						<li class="restrict">锁定</li>
+						<li style="background:#A4C050">选中</li>
+					</ul>
 				</td>
 			</tr></table>
 		</div>

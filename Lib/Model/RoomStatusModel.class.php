@@ -15,6 +15,9 @@ class RoomStatusModel extends Model {
 			}
 		}
 	}
+    public function updateRoomLater($roomid) {
+		D('Room')->where(array('roomid'=>$roomid))->save(array('update'=>array('%NULL')));
+    }
 	// update the time table of a certain room
 	public function updateRoom($roomid) {
 		D('Room')->where(array('roomid'=>$roomid))->save(array('update'=>array('%NOW', '')));

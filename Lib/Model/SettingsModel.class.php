@@ -37,7 +37,8 @@ class SettingsModel extends Model {
 	}
 
 	public function get($key) {
-		return $this->settings()[$key];
+		$this->settings();
+		return self::$_settings[$key];
 	}
 
 	public function settings() {

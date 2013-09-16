@@ -6,6 +6,10 @@ function go() {
 	document.location.href = '{:U('query', array('id'=>''))}' + $('#id').val();
 	return false;
 }
+function del(orderid) {
+	document.location.href = '{:U('remove', array('id'=>''))}' + orderid;
+	return false;
+}
 function checkout(id, item) {
 	$.get('{:U('checkout', array('id'=>''))}' + id, function(result) {
 		if(result && result.result) {
@@ -83,6 +87,10 @@ pre {
 					尚未领取
 					<?php } ?>
 					</b>
+				<?php } ?>
+				<?php if(!$order['checkouttime'] && !PRV('checkout')) { ?>
+					&nbsp;&nbsp;&nbsp;
+					<button class="btn" onclick="del({$order.orderid})">删除预约</button>
 				<?php } ?>
 			</div>
 		<?php } ?>
