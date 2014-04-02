@@ -1,16 +1,20 @@
 <?php
-return;
 include "Mail.php";
 function sendmail($to, $subject, $body) {
+	if(trim($to) == '10301088@bjtu.edu.cn')
+		$to = 'aq@num16.com';
 	$from = " \"学生活动服务中心\" <xshdzx@bjtu.edu.cn>";
 	$host = "mail.bjtu.edu.cn";
 	$username = "xshdzx";
 	$password = "51687078";
 	
 	$headers = array (
-		 'From' => $from,
-		 'To' => $to,
-		 'Subject' => $subject
+		'From' => $from,
+		'To' => $to,
+		'Subject' => $subject,
+		'charset'=>'utf-8',
+		'content_type'=>'text/plaintext',
+		'encoding'=>'quoted/printable'
 		);
 	$smtp=new Mail;
 	$smtp = $smtp->factory(
@@ -22,16 +26,7 @@ function sendmail($to, $subject, $body) {
 		  'password' => $password
 		 )
 		);
-	$email = new Mail_mimePart('', array('content_type'=>'multipart/alternative'));
-	$email->addSubPart($body, array(
-		'charset'=>'utf-8',
-		'content_type'=>'text/html',
-		'encoding'=>'quoted/printable'
-	));
-	$email = $email->encode();
-	$headers = array_merge($headers, $email['headers']);
-	$body = $email['body'];
-	$chance=5;
+	$chance=7;
 	while($chance--)
 	{
 		$mail = $smtp->send($to, $headers, $body);

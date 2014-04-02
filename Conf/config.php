@@ -4,7 +4,8 @@ return array(
 	'APP_STATUS' => 'debug',
 	'DB_HOST' => 'localhost',
 	'DB_USER' => 'root',
-	'DB_PWD' => '',
+	//'DB_PWD' => 'nimda123#',
+	//'DB_NAME' => 'hdzxnew',
 	'DB_NAME' => 'hdzx',
 	'DB_PREFIX' => '',
 );

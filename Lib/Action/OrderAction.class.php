@@ -146,12 +146,22 @@ class OrderAction extends BaseAction {
 
 	// commit order
 	public function commit() {
+		$orderNum = D('Order')->where(array('date'=>$_POST["date"], 'orderer'=>$_POST["ordererid"], 'isverified'=>1,'room'=>array('between','33,50')))->count();
+		if($orderNum>0 && PRV('userid') != 16)
+			die('     该学号在该日已有琴房预约(每个学号每日只能有一项琴房预约)');	
+		
 		if(isset($_SESSION['pendingorder']) && $_SESSION['pendingorder']) {
 			die('您已提交了一份申请，在完成邮箱认证前无法进行其他申请');
 		}
 		if(isset($_SESSION['ordercommit']) && $_SESSION['ordercommit'] > NOW) {
 			die('为保护服务器，提交间隔必须至少为5秒');
 		}
+		
+	//D('Order')->where("WHERE  `orderer` =  '12301120' AND  `room` BETWEEN 33 AND 50 AND  `date` =20131119 AND  `isverified` =1")->count();
+		
+		
+		
+		
 		$_SESSION['ordercommit'] = NOW + 10;
 		foreach(array(
 					'ordererid' => array('预约人学号', '/^[0-9]{8}$/'),

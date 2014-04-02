@@ -37,7 +37,8 @@ function show_pager($totalPage, $currentPage, $format = '?page=$$', $padding = 3
 		$ret[] = array('下一页', $currentPage + 1);
 	if($last < $totalPage)
 		$ret[] = array('最后一页', $totalPage);
-	foreach($ret as $v) {
+			
+foreach($ret as $v) {
 		if(is_array($v)) {
 			$url = str_replace('$$', $v[1], $format);
 			echo '<a href="' . $url . '">' . $v[0] . '</a>';

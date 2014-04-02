@@ -17,25 +17,41 @@ class VerifyAction extends BaseAction {
 	public function pending() {
 		$this->assign('title', '待审核预约');
 		$school = PRV('verify');
-        if(PRV('userid') == $this->adminUid) {
+        if(PRV('userid') == $this->adminUid) { 
+        	//管理员模式
             $where['isverified'] = array('IN', array(0,3));
-		} elseif($school > 0) {
+		} elseif($school > 0) { 
+			//各学院管理模式
 			$where['school'] = $school;
 			$where['isverified'] = 0;
 		} else {
+			//老师_校团委
 			$where['isverified'] = 3;
 			$where['_complex']['isverified'] = 0;
 			$where['_complex']['school'] = 0;
 			$where['_logic'] = 'or';
+			//var_dump($where);
 		}
+		
 		$wh = $where; unset($where);
 		$where['_complex'] = $wh;
 		$where['date'] = array('egt', TODAY);
+		
+		//var_dump($where);
+		//die();
+		
 		$orders = D('Order')->where($where)->select();
-		if($orders) {
+		
+		if($orders) { //查询结果不为空	
+			
+			//构造时间表
+			//时间表为一个二维数组，[每天的每小时][orderID]
 			$timetable = array();
+			$room = array();
 			foreach($orders as $r=>$v) {
 				$id = $v['orderid'];
+				$room[$id] = $v['room'];
+				
 				for($i = $v['starthour']; $i <= $v['endhour']; $i++) {
 					if($i < 10)
 						$i = '0' . ($i * 1);
@@ -48,12 +64,17 @@ class VerifyAction extends BaseAction {
 				}
 				$orders[$r]['info'] = json_decode($v['info'], true);
 			}
+			
+			//检测冲突，建立冲突表
+			//冲突表为二维素组，[主ID][与主ID冲突的ID]
 			$conflict = array();
-			foreach($timetable as $v) {
-				foreach($v as $k) {
+			foreach($timetable as $v) { //每一天的每个小时
+				foreach($v as $k) { 
 					foreach($v as $id) {
-						if($id == $k)
+						if($id == $k || $room[$id] != $room[$k])
 							continue;
+						//存在冲突
+						//存入(键名为ID，键 值为1)
 						if(!isset($conflict[$k])) {
 							$conflict[$k] = array($id => 1);
 						} else {
@@ -62,12 +83,15 @@ class VerifyAction extends BaseAction {
 					}
 				}
 			}
+			//将冲突表中[键名，键值]改为[键名的数组]
 			foreach($conflict as $k=>$v) {
 				$conflict[$k] = array_keys($v);
 			}
 			$this->assign('conflict', $conflict);
-		} else
+			
+		} else //查询结果为空
 			$orders = array();
+			
 		$schList = D('School')->getList();
 		$schList[0] = '校级';
 		$this->assign('school', $schList);

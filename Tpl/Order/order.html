@@ -1,3 +1,4 @@
+
 <style type="text/css">
 .legend {
 	margin: 0;
@@ -53,8 +54,10 @@ li.restrict {
 	font-weight: bold;
 }
 </style>
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/themes/default/default.css">
 <link rel="stylesheet" type="text/css" href="__PUBLIC__/jqueryui.css"/>
 <script type="text/javascript" src="__PUBLIC__/jqueryui.js"></script>
+<script type="text/javascript" src="__PUBLIC__/kindeditor-min.js"></script>
 <script type="text/javascript">
 $(function() {
 	$('.timelist .ordered').attr('title', '已被预约');
@@ -65,8 +68,13 @@ $(function() {
 	cdate = cdate.substr(0, 4) + '-' + cdate.substr(4, 2) + '-' + cdate.substr(6, 2);
 	$('.datepicker').datepicker('setDate', cdate);
 	unitChange();
+	
+	
 });
 var emptyTimeList = false;
+var schoolList = {$schools|json_encode};
+schoolList[0] = "校级";
+
 function initTimelist() {
 	if(!emptyTimeList) {
 		emptyTimeList = $('.timelist').html();
@@ -83,6 +91,43 @@ function initTimelist() {
 		highLight();
 		return false;
 	});
+	
+	//点击事件 - 用于查询
+	$('.timelist li').click(function() {
+		if($(this).hasClass('ordered')){
+			$.get('{:U('Query/getOrderByWeb')}', {'room': <?php echo $roomid; ?>, 'date': curDate, 'hour': $(this).text()}, function(orderResult) {
+				if(orderResult) {
+					orderResult['info']=eval('('+orderResult['info']+')');				
+					var dialog = KindEditor.dialog({
+						width: '500',
+						title: '占用详细信息',
+						body: '<div>'+
+						'学院: '+schoolList[orderResult['school']]+'<br/>'+
+						'申请人: '+orderResult['info']['orderer']+'<br/>'+
+						'申请房间: '+orderResult['info']['roomname']+'<br/>'+
+						'申请主题: '+orderResult['info']['topic']+'<br/>'+
+						'预约人学号: '+orderResult['orderer']+'<br/>'+
+						'联系方式: '+orderResult['info']['contact']+'<br/>'+
+						'申请单提交时间: '+orderResult['time']+'<br/>'+
+						'预约时间: '+orderResult['date']+'&nbsp;&nbsp;'+orderResult['starthour']+'点-'+orderResult['endhour']+'点<br/>'+
+						'活动人数: '+orderResult['info']['people']+'<br/>'+
+						'社团/单位： '+orderResult['info']['unitname']+'<br/>'+
+						'活动内容： '+orderResult['info']['content']+'<br/>'+	
+						'</div>',
+						closeBtn: {
+							name: '关闭',
+							click: function() {dialog.remove();}
+						},
+						noBtn: {
+							name: '关闭',
+							click: function() {dialog.remove();}
+						}
+					});	
+				}
+			}, 'JSON');
+		}
+	});
+	
 	$(document).mouseup(function() {
 		if(bad) {
 			time1 = time2 = 0;
@@ -129,9 +174,11 @@ function unitChange() {
 	$('.unit' + v).show();
 }
 var undefined;
+var curDate; //记录当前时间
 function changeDate(dateText) {
 	initTimelist();
 	dateText = dateText.replace(/\-/g, '');
+	curDate = dateText;
 	$('#selectedDate').val(dateText);
 	$.get('{:U('Query/roomDayTimelist')}', {'room': <?php echo $roomid; ?>, 'date': dateText}, function(result) {
 		if(result) {

@@ -20,7 +20,7 @@ class RoomStatusModel extends Model {
     }
 	// update the time table of a certain room
 	public function updateRoom($roomid) {
-		D('Room')->where(array('roomid'=>$roomid))->save(array('update'=>array('%NOW', '')));
+		D('Room')->where(array('roomid'=>$roomid))->save(array('update'=>array('%NOW()')));
 		// fetch all verified order of this room
 		$orderDAO = D('Order');
 		$orders = $orderDAO->where( array(
