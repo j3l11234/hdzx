@@ -1,1 +1,0 @@
-{"0":"verifyid","1":"orderid","2":"ispass","3":"verifier","4":"time","5":"comment","_autoinc":true,"_pk":"verifyid","_type":{"verifyid":"int(11)","orderid":"int(11)","ispass":"tinyint(1)","verifier":"int(11)","time":"timestamp","comment":"text"}}

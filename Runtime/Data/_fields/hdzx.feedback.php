@@ -1,1 +1,0 @@
-{"0":"feedbackid","1":"email","2":"content","3":"reply","4":"time","5":"frompage","_autoinc":true,"_pk":"feedbackid","_type":{"feedbackid":"int(11)","email":"varchar(255)","content":"text","reply":"text","time":"timestamp","frompage":"varchar(255)"}}

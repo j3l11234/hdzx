@@ -1,1 +1,0 @@
-{"0":"align","1":"key","2":"value","_autoinc":false,"_pk":"key","_type":{"align":"int(11)","key":"varchar(255)","value":"varchar(255)"}}

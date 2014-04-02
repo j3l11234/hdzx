@@ -1,1 +1,0 @@
-{"0":"newsid","1":"time","2":"title","3":"content","4":"summary","_autoinc":true,"_pk":"newsid","_type":{"newsid":"int(11)","time":"timestamp","title":"varchar(255)","content":"mediumtext","summary":"varchar(255)"}}

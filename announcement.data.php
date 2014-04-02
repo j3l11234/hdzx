@@ -8,5 +8,5 @@
 	<strong><span style="font-size:16px;color:#006600;">小剧场与多功能厅申请注意</span></strong> 
 </p>
 <p>
-	小剧场与多功能厅在线预约后还需要打印填写纸质版预约表单，<a href="http://202.112.159.251/hdzx_apply_document.doc" target="_blank">点击这里</a>下载。
+	小剧场与多功能厅在线预约后还需要打印填写纸质版预约表单，<a href="http://202.112.159.251/hdzxnew/hdzx_apply_document.doc" target="_blank">点击这里</a>下载。
 </p>

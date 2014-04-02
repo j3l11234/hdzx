@@ -1,1 +1,0 @@
-{"0":"room","1":"time","2":"islock","_autoinc":false,"_pk":"time","_type":{"room":"int(11)","time":"int(11)","islock":"tinyint(1)"}}

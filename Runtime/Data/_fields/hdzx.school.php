@@ -1,1 +1,0 @@
-{"0":"schoolid","1":"name","2":"align","_autoinc":true,"_pk":"schoolid","_type":{"schoolid":"int(11)","name":"varchar(255)","align":"int(11)"}}

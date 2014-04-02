@@ -90,8 +90,9 @@ class OrderAction extends BaseAction {
 
 	// display order form
 	public function order($room, $date) {
-        if($date <= TODAY)
+        if(($date <= TODAY) AND !(PRV('userid') == 16 || PRV('userid') == 3))
             $this->success('必须至少提前一天预约！');
+            
 		if(isset($_SESSION['pendingorder']) && $_SESSION['pendingorder'])
 			$this->redirect('pendingorder');
 		$this->assign('title', '房间预约');
