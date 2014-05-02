@@ -135,7 +135,10 @@ class RoomStatusModel extends Model {
 			'room' => array('IN', $room),
 			'time' => array( array('EGT', $datestart * 100), array('ELT', $dateend * 100 + 99) ),
 		) )->select() as $f) {
-			$ret[($multi ? $f['room'] . '_' : '') . $f['time']] = $f['islock'] ? _LOCKED : _OCCUPIED;
+			if(PRV('userid') == 16 || PRV('userid') == 3)
+				$ret[($multi ? $f['room'] . '_' : '') . $f['time']] = $f['islock'] ? _LOCKED : _OCCUPIED;
+			else
+				$ret[($multi ? $f['room'] . '_' : '') . $f['time']] = _OCCUPIED;
 		}
 		return $ret;
 	}
